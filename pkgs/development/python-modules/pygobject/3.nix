@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  fetchpatch,
   buildPythonPackage,
   pkg-config,
   glib,
@@ -33,6 +34,15 @@ buildPythonPackage rec {
     url = "mirror://gnome/sources/pygobject/${lib.versions.majorMinor version}/pygobject-${version}.tar.gz";
     hash = "sha256-jUh/+bn770I5Gel/fxyT/uH82PeLjZIMaORoR7yu44E=";
   };
+
+  patches = [ 
+    # Fix get_value error breaking gst-python
+    # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/4301
+    (fetchpatch {
+      url = "https://gitlab.gnome.org/GNOME/pygobject/-/commit/cf88f6ecdd8d3510658cd38f8e8c7a8385f0a478.patch";
+      hash = "sha256-tjqgONiOBW+DtLecmZu3+p3XsXKOGnMeuNgdx/9aHBo=";
+    })
+  ];
 
   depsBuildBuild = [ pkg-config ];
 
