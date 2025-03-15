@@ -8,6 +8,7 @@
   pkg-config,
   gnome,
   gtk3,
+  gtk4,
   atk,
   gobject-introspection,
   spidermonkey_128,
@@ -30,6 +31,7 @@
 let
   testDeps = [
     gtk3
+    gtk4
     atk
     pango.out
     gdk-pixbuf
@@ -143,6 +145,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   checkPhase = ''
     runHook preCheck
+    GTK_A11Y=none \
+    HOME=$(mktemp -d) \
     xvfb-run -s '-screen 0 800x600x24' \
       meson test --print-errorlogs
     runHook postCheck
