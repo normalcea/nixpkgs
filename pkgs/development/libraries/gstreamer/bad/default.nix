@@ -112,6 +112,7 @@
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
 , guiSupport ? true, directfb
+, directoryListingUpdater
 }:
 
 stdenv.mkDerivation rec {
@@ -371,6 +372,10 @@ stdenv.mkDerivation rec {
   hardeningDisable = [ "format" ];
 
   doCheck = false; # fails 20 out of 58 tests, expensive
+
+  passthru = {
+    updateScript = directoryListingUpdater { };
+  };
 
   meta = with lib; {
     description = "GStreamer Bad Plugins";

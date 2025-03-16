@@ -45,6 +45,7 @@
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform
 , hotdoc
+, directoryListingUpdater
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -164,6 +165,8 @@ stdenv.mkDerivation (finalAttrs: {
     # vs what was built) and to make them easier to search for.
     glEnabled = enableGl;
     waylandEnabled = enableWayland;
+
+    updateScript = directoryListingUpdater { };
   };
 
   passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;

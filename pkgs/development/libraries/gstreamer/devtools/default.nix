@@ -13,6 +13,7 @@
 , json-glib
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
+, directoryListingUpdater
 }:
 
 stdenv.mkDerivation rec {
@@ -58,6 +59,10 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     (lib.mesonEnable "doc" enableDocumentation)
   ];
+
+  passthru = {
+    updateScript = directoryListingUpdater { };
+  };
 
   meta = with lib; {
     description = "Integration testing infrastructure for the GStreamer framework";

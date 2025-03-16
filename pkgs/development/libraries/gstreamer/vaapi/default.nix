@@ -21,6 +21,7 @@
 , python3
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
+, directoryListingUpdater
 }:
 
 stdenv.mkDerivation rec {
@@ -81,6 +82,10 @@ stdenv.mkDerivation rec {
     patchShebangs \
       scripts/extract-release-date-from-doap-file.py
   '';
+
+  passthru = {
+    updateScript = directoryListingUpdater { };
+  };
 
   meta = with lib; {
     description = "Set of VAAPI GStreamer Plug-ins";

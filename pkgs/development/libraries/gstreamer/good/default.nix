@@ -50,6 +50,7 @@
 , openssl
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
+, directoryListingUpdater
 }:
 
 # MMAL is not supported on aarch64, see:
@@ -205,6 +206,10 @@ stdenv.mkDerivation rec {
 
   # must be explicitly set since 5590e365
   dontWrapQtApps = true;
+
+  passthru = {
+    updateScript = directoryListingUpdater { };
+  };
 
   meta = with lib; {
     description = "GStreamer Good Plugins";

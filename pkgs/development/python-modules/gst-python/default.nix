@@ -11,6 +11,7 @@
   gobject-introspection,
   gst_all_1,
   isPy3k,
+  directoryListingUpdater,
 }:
 
 buildPythonPackage rec {
@@ -56,6 +57,10 @@ buildPythonPackage rec {
   # TODO: Meson setup hook does not like buildPythonPackage
   # https://github.com/NixOS/nixpkgs/issues/47390
   installCheckPhase = "meson test --print-errorlogs";
+
+  passthru = {
+    updateScript = directoryListingUpdater { };
+  };
 
   meta = with lib; {
     homepage = "https://gstreamer.freedesktop.org";
