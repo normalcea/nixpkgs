@@ -59,7 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFlags =
     [
-      "-Dgtk_doc=true"
+      "-Ddocumentation=true"
     ]
     ++ lib.optionals (!finalAttrs.finalPackage.doCheck) [
       "-Dtests=false"
