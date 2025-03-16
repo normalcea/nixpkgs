@@ -59,7 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Disassemble a pile of tiles by removing matching pairs";
     mainProgram = "gnome-mahjongg";
     maintainers = teams.gnome.members;
-    license = licenses.gpl3Plus;
+    license = licenses.gpl2Plus;
     platforms = platforms.unix;
   };
 })
