@@ -183,7 +183,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postPatch = ''
-    patchShebangs src/data-to-c.py
+    patchShebangs \
+      src/data-to-c.py \
+      meson/generate-app-list.py
 
     # We can generate it ourselves.
     rm -f man/gnome-shell.1
