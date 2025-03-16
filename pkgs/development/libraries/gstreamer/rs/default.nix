@@ -46,11 +46,15 @@ let
     csound = [ csound ];
     lewton = [ ];
     spotify = [ ];
+    speechmatics = [ ];
 
     # generic
     file = [ ];
+    originalbuffer = [ ];
+    gopbuffer = [ ];
     sodium = [ libsodium ];
     threadshare = [ ];
+    streamgrouper = [ ];
 
     # mux
     flavors = [ ];
@@ -59,11 +63,14 @@ let
 
     # net
     aws = [ openssl ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ Security ];
+    hlsmultivariantsink = [ ];
     hlssink3 = [ ];
+    mpegtslive = [ ];
     ndi = [ ];
     onvif = [ pango ];
     raptorq = [ ];
     reqwest = [ openssl ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ Security ];
+    relationmeta = [ ];
     rtp = [ ];
     webrtc =
       [
@@ -74,6 +81,8 @@ let
         Security
         SystemConfiguration
       ];
+    webrtc-livekit = [ ];
+    webrtc-aws = [ ];
     webrtchttp =
       [
         gst-plugins-bad
@@ -83,6 +92,7 @@ let
         Security
         SystemConfiguration
       ];
+    quinn = [ ];
 
     # text
     textahead = [ ];
@@ -108,6 +118,7 @@ let
     png = [ ];
     rav1e = [ ];
     videofx = [ cairo ];
+    vvdec = [ ];
     webp = [ libwebp ];
   };
 
