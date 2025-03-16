@@ -9,6 +9,7 @@
   gobject-introspection,
   cairo,
   colord,
+  docutils,
   lcms2,
   pango,
   libstartup_notification,
@@ -106,6 +107,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     desktop-file-utils
+    docutils # for rst2man
     gettext
     glib
     libxcvt
@@ -114,6 +116,7 @@ stdenv.mkDerivation (finalAttrs: {
     xvfb-run
     pkg-config
     python3
+    python3.pkgs.argcomplete # for register-python-argcomplete
     wayland-scanner
     wrapGAppsHook4
     gi-docgen
@@ -181,7 +184,7 @@ stdenv.mkDerivation (finalAttrs: {
   postFixup = ''
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
     # TODO: Move this into a directory devhelp can find.
-    moveToOutput "share/mutter-15/doc" "$devdoc"
+    moveToOutput "share/mutter-${finalAttrs.passthru.libmutter_api_version}/doc" "$devdoc"
   '';
 
   # Install udev files into our own tree.
@@ -191,7 +194,8 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   passthru = {
-    libdir = "${finalAttrs.finalPackage}/lib/mutter-15";
+    libmutter_api_version = "16"; # bumped each dev cycle
+    libdir = "${finalAttrs.finalPackage}/lib/mutter-${finalAttrs.passthru.libmutter_api_version}";
 
     tests = {
       libdirExists = runCommand "mutter-libdir-exists" { } ''
