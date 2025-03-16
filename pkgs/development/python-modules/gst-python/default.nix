@@ -16,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "gst-python";
-  version = "1.24.10";
+  version = "1.26.0";
 
   format = "other";
 
@@ -27,7 +27,7 @@ buildPythonPackage rec {
 
   src = fetchurl {
     url = "https://gstreamer.freedesktop.org/src/gst-python/${pname}-${version}.tar.xz";
-    hash = "sha256-E1vPi28UaLwx5WYECf6O04EJ8B3sRHQ1FKovprOGMwk";
+    hash = "sha256-5QRqBdd6uxVnGtAc0ZCNF9YuWgb114Qb5DQq3io/uNs=";
   };
 
   # Python 2.x is not supported.
@@ -45,13 +45,14 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-rs
     pygobject3
   ];
 
   mesonFlags = [
     "-Dpygi-overrides-dir=${placeholder "out"}/${python.sitePackages}/gi/overrides"
     # Exec format error during configure
-    "-Dpython=${python.pythonOnBuildForHost.interpreter}"
+    "-Dpython-exe=${python.pythonOnBuildForHost.interpreter}"
   ];
 
   # TODO: Meson setup hook does not like buildPythonPackage
