@@ -53,7 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   postFixup = ''
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
-    moveToOutput "share/doc/msgraph-0" "$devdoc"
+    moveToOutput "share/doc/msgraph-1" "$devdoc"
   '';
 
   passthru = {
