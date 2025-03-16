@@ -4,16 +4,14 @@
   fetchurl,
   vala,
   pkg-config,
+  glib,
   gtk4,
   libadwaita,
   gnome,
   gdk-pixbuf,
-  librsvg,
   wrapGAppsHook4,
   gettext,
   itstool,
-  clutter,
-  clutter-gtk,
   libxml2,
   meson,
   ninja,
@@ -42,17 +40,16 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
+    glib
     gtk4
     libadwaita
-    gdk-pixbuf
-    librsvg
-    clutter
-    clutter-gtk
   ];
 
   postPatch = ''
     chmod +x build-aux/meson_post_install.py
     patchShebangs build-aux/meson_post_install.py
+    substituteInPlace build-aux/meson_post_install.py \
+      --replace-fail "gtk-update-icon-cache" "gtk4-update-icon-cache"
   '';
 
   passthru = {
