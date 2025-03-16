@@ -1,7 +1,6 @@
 { lib
 , stdenv
 , fetchurl
-, fetchpatch
 , replaceVars
 , meson
 , ninja
@@ -48,6 +47,7 @@
 , gsm
 , json-glib
 , ajaSupport ? lib.meta.availableOn stdenv.hostPlatform libajantv2
+, lcevcdec
 , libajantv2
 , libaom
 , libdc1394
@@ -105,6 +105,7 @@
 , CoreVideo
 , Foundation
 , MediaToolbox
+, directoryListingUpdater
 , enableGplPlugins ? true
 , bluezSupport ? stdenv.hostPlatform.isLinux
 # Causes every application using GstDeviceMonitor to send mDNS queries every 2 seconds
@@ -112,30 +113,23 @@
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
 , guiSupport ? true, directfb
-, directoryListingUpdater
 }:
 
 stdenv.mkDerivation rec {
   pname = "gst-plugins-bad";
-  version = "1.24.10";
+  version = "1.26.0";
 
   outputs = [ "out" "dev" ];
 
   src = fetchurl {
     url = "https://gstreamer.freedesktop.org/src/${pname}/${pname}-${version}.tar.xz";
-    hash = "sha256-FwfjEDlQybrtNkqK8roEldaxE/zTbhBi3aX1grj4kE0=";
+    hash = "sha256-+Ch6hMX2Y2ilpQ2l+WmZSgLEfyAiD/4coxVBk+Za8hY=";
   };
 
   patches = [
     # Add fallback paths for nvidia userspace libraries
     (replaceVars ./fix-paths.patch {
       inherit (addDriverRunpath) driverLink;
-    })
-    # Add support for newer AJA SDK from next GStreamer release
-    (fetchpatch {
-      url = "https://github.com/GStreamer/gstreamer/commit/d68ac0db571f44cae42b57c876436b3b09df616b.patch";
-      hash = "sha256-ZXwlHzuPT8kUKt5+HkqFH5tzL9l5NusDXImabj4fBbI=";
-      relative = "subprojects/${pname}";
     })
   ];
 
@@ -173,6 +167,7 @@ stdenv.mkDerivation rec {
     curl.dev
     fdk_aac
     gsm
+    lcevcdec
     libaom
     libdc1394
     libde265
@@ -272,16 +267,19 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
     "-Dexamples=disabled" # requires many dependencies and probably not useful for our users
-    "-Dglib-asserts=disabled" # asserts should be disabled on stable releases
+    "-Dglib_assert=false" # asserts should be disabled on stable releases
 
     "-Damfcodec=disabled" # Windows-only
+    "-Dandroidmedia=disabled" # Requires Android system.
     "-Davtp=disabled"
+    "-Dcuda-nvmm=disabled"
     "-Ddirectshow=disabled" # Windows-only
     "-Dqt6d3d11=disabled" # Windows-only
     "-Ddts=disabled" # required `libdca` library not packaged in nixpkgs as of writing, and marked as "BIG FAT WARNING: libdca is still in early development"
     "-Dzbar=${if enableZbar then "enabled" else "disabled"}"
     "-Dfaac=${if faacSupport then "enabled" else "disabled"}"
     "-Diqa=disabled" # required `dssim` library not packaging in nixpkgs as of writing, also this is AGPL so update license when adding support
+    "-Dlcevcencoder=disabled" # not packaged in nixpkgs as of writing
     "-Dmagicleap=disabled" # required `ml_audio` library not packaged in nixpkgs as of writing
     "-Dmsdk=disabled" # not packaged in nixpkgs as of writing / no Windows support
     # As of writing, with `libmpcdec` in `buildInputs` we get
@@ -295,9 +293,12 @@ stdenv.mkDerivation rec {
     # is needed, and then patching upstream to find it (though it probably
     # already works on Arch?).
     "-Dmusepack=disabled"
+    "-Dnvcomp=disabled"
+    "-Dnvdswrapper=disabled"
     "-Dopenni2=disabled" # not packaged in nixpkgs as of writing
     "-Dopensles=disabled" # not packaged in nixpkgs as of writing
     "-Dsvthevcenc=disabled" # required `SvtHevcEnc` library not packaged in nixpkgs as of writing
+    "-Dsvtjpegxs=disabled" # not packaged in nixpkgs as of writing
     "-Dteletext=disabled" # required `zvbi` library not packaged in nixpkgs as of writing
     "-Dtinyalsa=disabled" # not packaged in nixpkgs as of writing
     "-Dvoamrwbenc=disabled" # required `vo-amrwbenc` library not packaged in nixpkgs as of writing
