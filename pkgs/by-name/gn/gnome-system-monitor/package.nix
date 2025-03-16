@@ -7,6 +7,7 @@
   gtkmm4,
   libxml2,
   bash,
+  catch2_3,
   gtk4,
   libadwaita,
   glib,
@@ -49,6 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     bash
+    catch2_3
     gtk4
     libadwaita
     glib
