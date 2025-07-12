@@ -19,6 +19,7 @@
   which,
   python3,
   perl,
+  m1n1,
   armTrustedFirmwareAllwinner,
   armTrustedFirmwareAllwinnerH6,
   armTrustedFirmwareAllwinnerH616,
@@ -228,6 +229,21 @@ in
       "MLO"
       "u-boot.img"
     ];
+  };
+
+  ubootAppleM1 = buildUBoot {
+    defconfig = "apple_m1_defconfig";
+    extraMeta.platforms = [ "aarch64-linux" ];
+    filesToInstall = [
+      "m1n1-u-boot.bin"
+    ];
+
+    preInstall = ''
+      cat ${m1n1}/lib/m1n1/m1n1.bin \
+          arch/arm/dts/t[68]*.dtb \
+          <(gzip -c u-boot-nodtb.bin) \
+      > m1n1-u-boot.bin
+    '';
   };
 
   ubootBananaPi = buildUBoot {
