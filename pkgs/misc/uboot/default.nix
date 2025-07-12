@@ -234,6 +234,12 @@ in
     ];
   };
 
+  ubootAppleM1 = buildUBoot {
+    defconfig = "apple_m1_defconfig";
+    extraMeta.platforms = [ "aarch64-linux" ];
+    filesToInstall = [ "u-boot-nodtb.bin" ];
+  };
+
   ubootBananaPi = buildUBoot {
     defconfig = "Bananapi_defconfig";
     extraMeta.platforms = [ "armv7l-linux" ];
