@@ -69,7 +69,6 @@
   # Boolean flags
   withNativeCompilation ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
   noGui ? false,
-  srcRepo ? true,
   withAcl ? false,
   withAlsaLib ? false,
   withAthena ? false,
@@ -200,9 +199,12 @@ mkDerivation (finalAttrs: {
     ];
 
   postPatch = lib.concatStringsSep "\n" [
-    (lib.optionalString srcRepo ''
-      rm -fr .git
-    '')
+
+    # Delete bundled byte-compiled elisp files and generated autoloads
+    # whenever present.
+    ''
+      find . -type f \( -name "*.elc" -o -name "*loaddefs.el" \) -exec rm {} \;
+    ''
 
     # Add the name of the wrapped gvfsd
     # This used to be carried as a patch but it often got out of sync with
@@ -247,11 +249,6 @@ mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     makeWrapper
     pkg-config
-  ]
-  ++ lib.optionals (variant == "macport") [
-    texinfo
-  ]
-  ++ lib.optionals srcRepo [
     autoreconfHook
     texinfo
   ]
