@@ -687,7 +687,10 @@ with pkgs;
 
   fetchFromBitbucket = callPackage ../build-support/fetchbitbucket { };
 
-  fetchFromSavannah = callPackage ../build-support/fetchsavannah { };
+  fetchFromSavannah =
+    lib.warn "`fetchFromSavannah` is deprecated and will be removed in a future release." callPackage
+      ../build-support/fetchsavannah
+      { };
 
   fetchFromSourcehut = callPackage ../build-support/fetchsourcehut { };
 
