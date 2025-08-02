@@ -234,6 +234,37 @@ in
     ];
   };
 
+  ubootAppleM1 =
+    let
+      tag = "asahi-v2025.04-1";
+      src = fetchFromGitHub {
+        # tracking: https://pagure.io/fedora-asahi/uboot-tools/commits/main
+        owner = "AsahiLinux";
+        repo = "u-boot";
+        inherit tag;
+        hash = "sha256-/z37qj26AqsyEBsFT6UEN3GjG6KVsoJOoUB4s9BRDbE=";
+      };
+    in
+    (buildUBoot {
+      version = tag;
+      inherit src;
+
+      defconfig = "apple_m1_defconfig";
+      # Enlarges font at boot screen
+      extraConfig = ''
+        CONFIG_IDENT_STRING=" ${tag}"
+        CONFIG_VIDEO_FONT_4X6=n
+        CONFIG_VIDEO_FONT_8X16=n
+        CONFIG_VIDEO_FONT_SUN12X22=n
+        CONFIG_VIDEO_FONT_16X32=y
+      '';
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "u-boot-nodtb.bin" ];
+    }).overrideAttrs
+      (oldAttrs: {
+        makeFlags = builtins.filter (s: (!(lib.strings.hasPrefix "DTC=" s))) oldAttrs.makeFlags;
+      });
+
   ubootBananaPi = buildUBoot {
     defconfig = "Bananapi_defconfig";
     extraMeta.platforms = [ "armv7l-linux" ];
