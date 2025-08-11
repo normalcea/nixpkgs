@@ -241,7 +241,7 @@ let
     # Used by wine, firefox with debugging version of Flash, ...
     pkgsi686Linux =
       let
-        isSupported = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86;
+        isSupported = stdenv.hostPlatform.isLinux;
       in
       if !config.allowAliases || isSupported then
         nixpkgsFun {
