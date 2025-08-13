@@ -1,13 +1,13 @@
 {
-  stdenv,
   lib,
   fetchFromGitea,
-  autoconf,
-  automake,
-  libtool,
+  cmake,
+  ninja,
+  llvmPackages,
+  withOpenMP ? true,
 }:
 
-stdenv.mkDerivation rec {
+llvmPackages.stdenv.mkDerivation (finalAttrs: {
   pname = "soundtouch";
   version = "2.4.0";
 
@@ -15,19 +15,26 @@ stdenv.mkDerivation rec {
     domain = "codeberg.org";
     owner = "soundtouch";
     repo = "soundtouch";
-    rev = version;
+    tag = finalAttrs.version;
     hash = "sha256-7JUBAFURKtPCZrcKqL1rOLdsYMd7kGe7wY0JUl2XPvw=";
   };
 
-  nativeBuildInputs = [
-    autoconf
-    automake
-    libtool
+  patches = [
+    ./fix-cmake-install-dir.patch
   ];
 
-  preConfigure = "./bootstrap";
+  nativeBuildInputs = [
+    cmake
+    ninja
+  ];
 
-  enableParallelBuilding = true;
+  buildInputs = lib.optionals withOpenMP [ llvmPackages.openmp ];
+
+  cmakeFlags = [
+    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
+    (lib.cmakeBool "SOUNDTOUCH_DLL" true)
+    (lib.cmakeBool "OPENMP" withOpenMP)
+  ];
 
   meta = {
     description = "Program and library for changing the tempo, pitch and playback rate of audio";
@@ -40,4 +47,4 @@ stdenv.mkDerivation rec {
     mainProgram = "soundstretch";
     platforms = lib.platforms.all;
   };
-}
+})

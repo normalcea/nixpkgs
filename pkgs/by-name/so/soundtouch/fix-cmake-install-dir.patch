@@ -1,0 +1,15 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3047b93..711ee26 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -157,8 +157,8 @@ endif()
+ # pkgconfig
+ set(prefix "${CMAKE_INSTALL_PREFIX}")
+ set(execprefix "\${prefix}")
+-set(libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
+-set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
++set(libdir "${CMAKE_INSTALL_FULL_LIBDIR}")
++set(includedir "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+ set(VERSION "${CMAKE_PROJECT_VERSION}")
+ configure_file(soundtouch.pc.in "${CMAKE_CURRENT_BINARY_DIR}/soundtouch.pc" @ONLY)
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/soundtouch.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT SoundTouch)
