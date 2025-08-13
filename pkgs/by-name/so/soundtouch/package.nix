@@ -38,6 +38,16 @@ llvmPackages.stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Program and library for changing the tempo, pitch and playback rate of audio";
+    longDescription = ''
+      SoundTouch is an open-source audio processing library that allows
+      changing the sound tempo, pitch and playback rate parameters
+      independently from each other:
+
+      - Change tempo while maintaining the original pitch
+      - Change pitch while maintaining the original tempo
+      - Change playback rate that affects both tempo and pitch at the same time
+      - Change any combination of tempo/pitch/rate
+    '';
     homepage = "https://www.surina.net/soundtouch/";
     license = lib.licenses.lgpl21Plus;
     maintainers = with lib.maintainers; [
