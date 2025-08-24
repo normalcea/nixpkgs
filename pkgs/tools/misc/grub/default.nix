@@ -618,7 +618,9 @@ stdenv.mkDerivation (finalAttrs: {
     else
       lib.optionalString inPCSystems "${pcSystems.${stdenv.hostPlatform.system}.target}-pc";
 
-  doCheck = false;
+  # disable tests on aarch64 and when cross-compiling
+  doCheck = !(stdenv.hostPlatform.isAarch || stdenv.hostPlatform != stdenv.buildPlatform);
+
   enableParallelBuilding = true;
 
   postInstall = ''
