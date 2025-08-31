@@ -86,13 +86,13 @@ in
 assert zfsSupport -> zfs != null;
 assert !(efiSupport && xenSupport);
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "grub";
   version = "2.12";
 
   src = fetchgit {
     url = "https://https.git.savannah.gnu.org/git/grub.git";
-    tag = "grub-${version}";
+    tag = "grub-${finalAttrs.version}";
     hash = "sha256-lathsBb2f7urh8R86ihpTdwo3h1hAHnRiHd5gCLVpBc=";
   };
 
@@ -532,7 +532,7 @@ stdenv.mkDerivation rec {
     libtool
     bash
   ]
-  ++ lib.optional doCheck qemu
+  ++ lib.optional finalAttrs.doCheck qemu
   ++ lib.optional zfsSupport zfs;
 
   strictDeps = true;
@@ -665,4 +665,4 @@ stdenv.mkDerivation rec {
 
     maintainers = [ ];
   };
-}
+})
