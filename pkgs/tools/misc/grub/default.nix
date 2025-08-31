@@ -636,33 +636,22 @@ stdenv.mkDerivation (finalAttrs: {
     nixos-install-grub-uefi-spec = nixosTests.installer.simpleUefiGrubSpecialisation;
   };
 
-  meta = with lib; {
+  meta = {
     description = "GNU GRUB, the Grand Unified Boot Loader";
-
     longDescription = ''
-      GNU GRUB is a Multiboot boot loader. It was derived from GRUB, GRand
-      Unified Bootloader, which was originally designed and implemented by
-      Erich Stefan Boleyn.
-
-      Briefly, the boot loader is the first software program that runs when a
-      computer starts.  It is responsible for loading and transferring
-      control to the operating system kernel software (such as the Hurd or
-      the Linux).  The kernel, in turn, initializes the rest of the
-      operating system (e.g., GNU).
+      GNU GRUB is a Multiboot boot loader. It was derived from GRUB,
+      GRand Unified Bootloader, which was originally designed and
+      implemented by Erich Stefan Boleyn.
     '';
-
     homepage = "https://www.gnu.org/software/grub/";
-
-    license = licenses.gpl3Plus;
-
+    license = lib.licenses.gpl3Plus;
     platforms =
       if efiSupport then
         lib.attrNames efiSystemsBuild
       else if xenSupport then
         lib.attrNames xenSystemsBuild
       else
-        platforms.gnu ++ platforms.linux;
-
+        lib.platforms.gnu ++ lib.platforms.linux;
     maintainers = [ ];
   };
 })
