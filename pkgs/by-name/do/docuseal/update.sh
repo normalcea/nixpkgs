@@ -1,23 +1,26 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl bundix git ruby_3_3 prefetch-yarn-deps pkg-config xmlstarlet nix-update nixfmt
+#!nix-shell -i bash -p curl jq bundix ruby_3_4 prefetch-yarn-deps nix-update nixfmt
 
 set -eu -o pipefail
 dir="$(dirname "$(readlink -f "$0")")"
 
-latest=$(curl --fail --silent ${GITHUB_TOKEN:+-u ":$GITHUB_TOKEN"} https://github.com/docusealco/docuseal/tags.atom | xmlstarlet sel -N atom="http://www.w3.org/2005/Atom" -t -m /atom:feed/atom:entry -v atom:title -n | head -n1)
+current=$(nix --extra-experimental-features nix-command eval --raw -f . docuseal.src.tag)
+latest=$(curl ${GITHUB_TOKEN:+" -u \":$GITHUB_TOKEN\""} "https://api.github.com/repos/docusealco/docuseal/tags?per_page=1" | jq -r '.[0].name')
 
-if [[ "$(nix-instantiate -A docuseal.version --eval --json | jq -r)" = "$latest" ]];
-then
-  echo "Already using version $latest, skipping"
+if [[ "$current" == "$latest" ]]; then
+  echo "'docuseal' is up-to-date ($current == $latest)"
   exit 0
 fi
 
 echo "Updating docuseal to $latest"
 
 repo=$(mktemp -d /tmp/docuseal-update.XXX)
+
 rm -f "$dir/gemset.nix" "$dir/Gemfile" "$dir/Gemfile.lock" "$dir/yarn.lock"
 
-git clone https://github.com/docusealco/docuseal.git --branch "$latest" "$repo"
+docuseal_storepath=$(nix --extra-experimental-features "nix-command flakes" flake prefetch github:docusealco/docuseal/"$latest" --json | jq -r '.storePath')
+
+cp -r  --no-preserve=mode,ownership $docuseal_storepath/* $repo/
 
 # patch ruby version
 sed -i "/^ruby '[0-9]\+\.[0-9]\+\.[0-9]\+'$/d" "$repo/Gemfile"
@@ -38,9 +41,6 @@ YARN_HASH="$(nix --extra-experimental-features nix-command hash to-sri --type sh
 # update
 cp "$repo/Gemfile" "$repo/Gemfile.lock" "$repo/yarn.lock" "$dir/"
 nix-update docuseal --version "$latest"
-sed -i -E -e "s#hash = \".*\"#hash = \"$YARN_HASH\"#" "$dir"/web.nix
+nix-update docuseal --subpackage "docusealWeb"
 
-# fmt
-nixfmt "$dir/"
-
-rm -rf "$repo"
+nixfmt "$dir/gemset.nix"
