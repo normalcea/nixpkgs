@@ -10844,6 +10844,7 @@ with pkgs;
     emacs30-gtk3
     emacs30-nox
     emacs30-pgtk
+    emacs30-small
 
     emacs30-macport
     ;
@@ -10853,6 +10854,7 @@ with pkgs;
   emacs-gtk = emacs30-gtk3;
   emacs-nox = emacs30-nox;
   emacs-pgtk = emacs30-pgtk;
+  emacs-small = emacs30-small;
 
   emacsPackagesFor =
     emacs:

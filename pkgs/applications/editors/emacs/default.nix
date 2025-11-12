@@ -31,6 +31,22 @@ lib.makeScope pkgs.newScope (
       withPgtk = true;
     };
 
+    emacs30-small =
+      (self.emacs30.override {
+        withNativeCompilation = false;
+        withTreeSitter = false;
+        withMailutils = false;
+        noGui = true;
+      }).overrideAttrs
+        {
+          pname = "emacs-small";
+          nativeBuildInputs = [ pkgs.pkg-config ];
+          buildInputs = [
+            pkgs.gnutls
+            pkgs.ncurses
+          ];
+        };
+
     emacs30-macport = callPackage (self.sources.emacs30-macport) (
       inheritedArgs
       // {
