@@ -8,18 +8,20 @@
   python3Packages,
   wrapGAppsHook4,
   gtk4,
+  gtksourceview5,
   glib,
   gdk-pixbuf,
   gobject-introspection,
   desktop-file-utils,
   appstream-glib,
+  shared-mime-info,
   libadwaita,
   nix-update-script,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "gnome-secrets";
-  version = "10.4";
+  version = "12.0";
   format = "other";
 
   src = fetchFromGitLab {
@@ -27,7 +29,7 @@ python3Packages.buildPythonApplication rec {
     owner = "World";
     repo = "secrets";
     rev = version;
-    hash = "sha256-FyBtw7Gkvd5XONkM7OVGxE+S5FpuUIl7KWLFHoQeoN4=";
+    hash = "sha256-U+ez/rhaXROcLdXhFY992YzIRBCkR05hxkAYbWIpa/A=";
   };
 
   nativeBuildInputs = [
@@ -39,10 +41,12 @@ python3Packages.buildPythonApplication rec {
     desktop-file-utils
     appstream-glib
     gobject-introspection
+    shared-mime-info
   ];
 
   buildInputs = [
     gtk4
+    gtksourceview5
     glib
     gdk-pixbuf
     libadwaita
@@ -57,6 +61,7 @@ python3Packages.buildPythonApplication rec {
     validators
     yubico
     zxcvbn-rs-py
+    pyhibp
   ];
 
   # Prevent double wrapping, let the Python wrapper use the args in preFixup.
