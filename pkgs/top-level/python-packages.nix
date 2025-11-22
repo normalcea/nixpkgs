@@ -13384,6 +13384,8 @@ self: super: with self; {
 
   pyhepmc = callPackage ../development/python-modules/pyhepmc { };
 
+  pyhibp = callPackage ../development/python-modules/pyhibp { };
+
   pyhidra = callPackage ../development/python-modules/pyhidra { };
 
   pyhik = callPackage ../development/python-modules/pyhik { };
