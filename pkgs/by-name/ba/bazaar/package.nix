@@ -23,6 +23,8 @@
   libyaml,
   md4c,
   nix-update-script,
+  contentConfigPath ? "",
+  blocklistPath ? "",
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -58,6 +60,11 @@ stdenv.mkDerivation (finalAttrs: {
     libxmlb
     libyaml
     md4c
+  ];
+
+  mesonFlags = [
+    (lib.mesonOption "hardcoded_content_config_path" contentConfigPath)
+    (lib.mesonOption "hardcoded_blocklist_path" blocklistPath)
   ];
 
   preFixup = ''
