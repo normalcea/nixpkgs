@@ -9,6 +9,7 @@
   "gsconnect@andyholmes.github.io" = callPackage ./gsconnect { };
   "guillotine@fopdoodle.net" = callPackage ./guillotine { };
   "impatience@gfxmonk.net" = callPackage ./impatience { };
+  "mosaicwm@cleomenezesjr.github.io" = callPackage ./mosaicwm { };
   "no-title-bar@jonaspoehler.de" = callPackage ./no-title-bar { };
   "pidgin@muffinmad" = callPackage ./pidgin-im-integration { };
   "pop-shell@system76.com" = callPackage ./pop-shell { };
