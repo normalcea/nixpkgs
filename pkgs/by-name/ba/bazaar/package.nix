@@ -23,6 +23,7 @@
   libyaml,
   md4c,
   nix-update-script,
+  mainConfigPath ? "",
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -58,6 +59,10 @@ stdenv.mkDerivation (finalAttrs: {
     libxmlb
     libyaml
     md4c
+  ];
+
+  mesonFlags = [
+    (lib.mesonOption "hardcoded_main_config_path" mainConfigPath)
   ];
 
   preFixup = ''
