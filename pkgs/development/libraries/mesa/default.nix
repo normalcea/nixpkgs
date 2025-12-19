@@ -38,6 +38,7 @@
   wayland,
   wayland-protocols,
   wayland-scanner,
+  xmlstarlet,
   xcbutilkeysyms,
   xorg,
   zstd,
@@ -322,6 +323,7 @@ stdenv.mkDerivation {
     rust-bindgen
     rust-cbindgen
     wayland-scanner
+    xmlstarlet # needed for patching drirc XML files
   ]
   ++ lib.optionals needNativeCLC [
     # `or null` to not break eval with `attribute missing` on darwin to linux cross
@@ -383,6 +385,26 @@ stdenv.mkDerivation {
 
     # add RPATH here so Zink can find libvulkan.so
     patchelf --add-rpath ${vulkan-loader}/lib $out/lib/libgallium*.so
+
+    echo "patching executable names for asahi in $out/share/drirc.d/00-mesa-defaults.conf"
+    readarray -t names_array <<<$(xml sel -t -v '/driconf/device[@driver="asahi"]/application/@*' \
+                                                $out/share/drirc.d/00-mesa-defaults.conf)
+    for (( i = 0; i < "''${#names_array[@]}"; i += 2 )); do
+       export xml_application_name="''${names_array[i]} Wrapped"
+       export xml_executable_name=".''${names_array[i+1]}-wrapped"
+       xml ed -L -s '/driconf/device[@driver="asahi"]' \
+         --type elem --name "application" \
+         --var new_node '$prev' \
+         --insert '$new_node' --type attr --name "name" --value "$xml_application_name"  \
+         --insert '$new_node' --type attr --name "executable" --value "$xml_executable_name" \
+         $out/share/drirc.d/00-mesa-defaults.conf
+       xml ed -L -s "/driconf/device[@driver=\"asahi\"]/application[@executable=\"''${xml_executable_name}\"]" \
+         --type elem --name "option" \
+         --var new_node '$prev' \
+         --insert '$new_node' --type attr --name "name" --value "force_gl_renderer" \
+         --insert '$new_node' --type attr --name "value" --value "AGX G13/G14" \
+         $out/share/drirc.d/00-mesa-defaults.conf
+    done
   '';
 
   passthru = {
