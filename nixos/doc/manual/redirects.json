@@ -605,9 +605,6 @@
   "sec-gnome-core-developer-tools": [
     "index.html#sec-gnome-core-developer-tools"
   ],
-  "sec-gnome-enable-flashback": [
-    "index.html#sec-gnome-enable-flashback"
-  ],
   "sec-gnome-icons-and-gtk-themes": [
     "index.html#sec-gnome-icons-and-gtk-themes"
   ],
@@ -2192,7 +2189,8 @@
     "release-notes.html#sec-release-26.05-new-modules"
   ],
   "sec-release-26.05-incompatibilities": [
-    "release-notes.html#sec-release-26.05-incompatibilities"
+    "release-notes.html#sec-release-26.05-incompatibilities",
+    "index.html#sec-gnome-enable-flashback"
   ],
   "sec-release-26.05-notable-changes": [
     "release-notes.html#sec-release-26.05-notable-changes"

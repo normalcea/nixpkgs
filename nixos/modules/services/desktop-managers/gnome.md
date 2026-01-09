@@ -64,31 +64,6 @@ You can install GNOME core developer tools with:
 { services.gnome.core-developer-tools.enable = true; }
 ```
 
-## Enabling GNOME Flashback {#sec-gnome-enable-flashback}
-
-GNOME Flashback provides a desktop environment based on the classic GNOME 2 architecture. You can enable the default GNOME Flashback session, which uses the Metacity window manager, with:
-
-```nix
-{ services.desktopManager.gnome.flashback.enableMetacity = true; }
-```
-
-It is also possible to create custom sessions that replace Metacity with a different window manager using [](#opt-services.desktopManager.gnome.flashback.customSessions).
-
-The following example uses `xmonad` window manager:
-
-```nix
-{
-  services.desktopManager.gnome.flashback.customSessions = [
-    {
-      wmName = "xmonad";
-      wmLabel = "XMonad";
-      wmCommand = "${pkgs.haskellPackages.xmonad}/bin/xmonad";
-      enableGnomePanel = false;
-    }
-  ];
-}
-```
-
 ## Icons and GTK Themes {#sec-gnome-icons-and-gtk-themes}
 
 Icon themes and GTK themes don’t require any special option to install in NixOS.

@@ -17,68 +17,12 @@ let
 
   cfg = config.services.desktopManager.gnome;
   serviceCfg = config.services.gnome;
-
-  # Prioritize nautilus by default when opening directories
-  mimeAppsList = pkgs.writeTextFile {
-    name = "gnome-mimeapps";
-    destination = "/share/applications/mimeapps.list";
-    text = ''
-      [Default Applications]
-      inode/directory=nautilus.desktop;org.gnome.Nautilus.desktop
-    '';
-  };
-
-  defaultFavoriteAppsOverride = ''
-    [org.gnome.shell]
-    favorite-apps=[ 'org.gnome.Epiphany.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop' ]
-  '';
-
-  nixos-background-light = pkgs.nixos-artwork.wallpapers.simple-blue;
-  nixos-background-dark = pkgs.nixos-artwork.wallpapers.simple-dark-gray;
-
-  # TODO: Having https://github.com/NixOS/nixpkgs/issues/54150 would supersede this
-  nixos-gsettings-desktop-schemas = pkgs.gnome.nixos-gsettings-overrides.override {
-    inherit (cfg) extraGSettingsOverrides extraGSettingsOverridePackages favoriteAppsOverride;
-    inherit flashbackEnabled nixos-background-dark nixos-background-light;
-  };
-
-  nixos-background-info = pkgs.writeTextFile {
-    name = "nixos-background-info";
-    text = ''
-      <?xml version="1.0"?>
-      <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-      <wallpapers>
-        <wallpaper deleted="false">
-          <name>Blobs</name>
-          <filename>${nixos-background-light.gnomeFilePath}</filename>
-          <filename-dark>${nixos-background-dark.gnomeFilePath}</filename-dark>
-          <options>zoom</options>
-          <shade_type>solid</shade_type>
-          <pcolor>#3a4ba0</pcolor>
-          <scolor>#2f302f</scolor>
-        </wallpaper>
-      </wallpapers>
-    '';
-    destination = "/share/gnome-background-properties/nixos.xml";
-  };
-
-  flashbackEnabled = cfg.flashback.enableMetacity || lib.length cfg.flashback.customSessions > 0;
-  flashbackWms =
-    lib.optional cfg.flashback.enableMetacity {
-      wmName = "metacity";
-      wmLabel = "Metacity";
-      wmCommand = "${pkgs.metacity}/bin/metacity";
-      enableGnomePanel = true;
-    }
-    ++ cfg.flashback.customSessions;
-
   notExcluded =
     pkg: mkDefault (utils.disablePackageByName pkg config.environment.gnome.excludePackages);
 
   removeExcluded =
     pkgList: utils.removePackagesByName pkgList config.environment.gnome.excludePackages;
 in
-
 {
   meta = {
     doc = ./gnome.md;
@@ -105,19 +49,6 @@ in
     (lib.mkRenamedOptionModule
       [ "services" "xserver" "desktopManager" "gnome" "sessionPath" ]
       [ "services" "desktopManager" "gnome" "sessionPath" ]
-    )
-    # flashback options
-    (lib.mkRenamedOptionModule
-      [ "services" "xserver" "desktopManager" "gnome" "flashback" "customSessions" ]
-      [ "services" "desktopManager" "gnome" "flashback" "customSessions" ]
-    )
-    (lib.mkRenamedOptionModule
-      [ "services" "xserver" "desktopManager" "gnome" "flashback" "enableMetacity" ]
-      [ "services" "desktopManager" "gnome" "flashback" "enableMetacity" ]
-    )
-    (lib.mkRenamedOptionModule
-      [ "services" "xserver" "desktopManager" "gnome" "flashback" "panelModulePackages" ]
-      [ "services" "desktopManager" "gnome" "flashback" "panelModulePackages" ]
     )
     (lib.mkRenamedOptionModule
       [ "services" "gnome" "core-utilities" "enable" ]
@@ -154,19 +85,6 @@ in
         '';
       };
 
-      favoriteAppsOverride = mkOption {
-        internal = true; # this is messy
-        default = defaultFavoriteAppsOverride;
-        type = types.lines;
-        example = literalExpression ''
-          '''
-            [org.gnome.shell]
-            favorite-apps=[ 'firefox.desktop', 'org.gnome.Calendar.desktop' ]
-          '''
-        '';
-        description = "List of desktop files to put as favorite apps into pkgs.gnome-shell. These need to be installed somehow globally.";
-      };
-
       extraGSettingsOverrides = mkOption {
         default = "";
         type = types.lines;
@@ -180,56 +98,6 @@ in
       };
 
       debug = mkEnableOption "pkgs.gnome-session debug messages";
-
-      flashback = {
-        enableMetacity = mkEnableOption "the standard GNOME Flashback session with Metacity";
-
-        customSessions = mkOption {
-          type = types.listOf (
-            types.submodule {
-              options = {
-                wmName = mkOption {
-                  type = types.strMatching "[a-zA-Z0-9_-]+";
-                  description = "A unique identifier for the window manager.";
-                  example = "xmonad";
-                };
-
-                wmLabel = mkOption {
-                  type = types.str;
-                  description = "The name of the window manager to show in the session chooser.";
-                  example = "XMonad";
-                };
-
-                wmCommand = mkOption {
-                  type = types.str;
-                  description = "The executable of the window manager to use.";
-                  example = literalExpression ''"''${pkgs.haskellPackages.xmonad}/bin/xmonad"'';
-                };
-
-                enableGnomePanel = mkOption {
-                  type = types.bool;
-                  default = true;
-                  example = false;
-                  description = "Whether to enable the GNOME panel in this session.";
-                };
-              };
-            }
-          );
-          default = [ ];
-          description = "Other GNOME Flashback sessions to enable.";
-        };
-
-        panelModulePackages = mkOption {
-          default = [ pkgs.gnome-applets ];
-          defaultText = literalExpression "[ pkgs.gnome-applets ]";
-          type = types.listOf types.package;
-          description = ''
-            Packages containing modules that should be made available to `pkgs.gnome-panel` (usually for applets).
-
-            If you're packaging something to use here, please install the modules in `$out/lib/gnome-panel/modules`.
-          '';
-        };
-      };
     };
 
     environment.gnome.excludePackages = mkOption {
@@ -242,7 +110,7 @@ in
   };
 
   config = lib.mkMerge [
-    (lib.mkIf (cfg.enable || flashbackEnabled) {
+    (lib.mkIf (cfg.enable) {
       # Seed our configuration into nixos-generate-config
       system.nixos-generate-config.desktopConfiguration = [
         ''
@@ -274,50 +142,6 @@ in
       environment.systemPackages = cfg.sessionPath;
 
       environment.sessionVariables.GNOME_SESSION_DEBUG = lib.mkIf cfg.debug "1";
-
-      # Override GSettings schemas
-      environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = "${nixos-gsettings-desktop-schemas}/share/gsettings-schemas/nixos-gsettings-overrides/glib-2.0/schemas";
-    })
-
-    (lib.mkIf flashbackEnabled {
-      services.displayManager.sessionPackages =
-        let
-          wmNames = map (wm: wm.wmName) flashbackWms;
-          namesAreUnique = lib.unique wmNames == wmNames;
-        in
-        assert (lib.assertMsg namesAreUnique "Flashback WM names must be unique.");
-        map (
-          wm:
-          pkgs.gnome-flashback.mkSessionForWm {
-            inherit (wm) wmName wmLabel wmCommand;
-          }
-        ) flashbackWms;
-
-      security.pam.services.gnome-flashback = {
-        enableGnomeKeyring = true;
-      };
-
-      systemd.packages = [
-        pkgs.gnome-flashback
-        pkgs.metacity
-        (pkgs.gnome-panel-with-modules.override {
-          panelModulePackages = cfg.flashback.panelModulePackages;
-        })
-      ]
-      ++ map pkgs.gnome-flashback.mkSystemdTargetForWm cfg.flashback.customSessions;
-
-      environment.systemPackages = [
-        pkgs.gnome-flashback
-        (pkgs.gnome-panel-with-modules.override {
-          panelModulePackages = cfg.flashback.panelModulePackages;
-        })
-      ]
-      # For /share/applications/${wmName}.desktop
-      ++ (map (
-        wm: pkgs.gnome-flashback.mkWmApplication { inherit (wm) wmName wmLabel wmCommand; }
-      ) flashbackWms)
-      # For /share/pkgs.gnome-session/sessions/gnome-flashback-${wmName}.session
-      ++ (map (wm: pkgs.gnome-flashback.mkGnomeSession { inherit (wm) wmName wmLabel; }) flashbackWms);
     })
 
     (lib.mkIf serviceCfg.core-os-services.enable {
@@ -430,7 +254,6 @@ in
           ];
           optionalPackages = [
             pkgs.adwaita-icon-theme
-            nixos-background-info
             pkgs.gnome-backgrounds
             pkgs.gnome-bluetooth
             pkgs.gnome-color-manager
@@ -497,9 +320,6 @@ in
       # Let nautilus find extensions
       # TODO: Create nautilus-with-extensions package
       environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = "${config.system.path}/lib/nautilus/extensions-4";
-
-      # Override default mimeapps for nautilus
-      environment.sessionVariables.XDG_DATA_DIRS = [ "${mimeAppsList}/share" ];
 
       environment.pathsToLink = [
         "/share/nautilus-python/extensions"
